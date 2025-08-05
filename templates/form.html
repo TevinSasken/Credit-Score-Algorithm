@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Credit Risk Scoring</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 py-10 px-4">
+
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul class="mb-4 text-red-600 text-sm">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    {% endwith %}
+
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Credit Risk Scoring Form</h2>
+
+    <form id="credit-form" method="POST" action="/submit" class="space-y-6">
+
+        <!-- National ID -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">National ID Number</label>
+            <input type="text" id="national_id" name="national_id" required
+                   class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <p class="text-sm text-red-600 mt-1" id="national_id_error"></p>
+        </div>
+
+        <!-- Education Level -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Education Level</label>
+            <select id="education_level" name="education_level" required
+                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">-- Select --</option>
+                <option>None</option>
+                <option>High School</option>
+                <option>Bachelor's Degree</option>
+                <option>Master's Degree</option>
+                <option>PhD</option>
+            </select>
+            <p class="text-sm text-red-600 mt-1" id="education_level_error"></p>
+        </div>
+
+        <!-- Employment Status -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Employment Status</label>
+            <select id="employment_status" name="employment_status" required
+                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">-- Select --</option>
+                <option>Unemployed</option>
+                <option>Part-time</option>
+                <option>Full-time</option>
+                <option>Self-employed</option>
+                <option>Retired</option>
+            </select>
+            <p class="text-sm text-red-600 mt-1" id="employment_status_error"></p>
+        </div>
+
+        <!-- Monthly Income -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Monthly Verified Income</label>
+            <input type="number" id="monthly_income" name="monthly_income" step="0.01" min="0" required
+                   class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <p class="text-sm text-red-600 mt-1" id="monthly_income_error"></p>
+        </div>
+
+        <!-- Home Ownership -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Home Ownership</label>
+            <select id="home_ownership" name="home_ownership" required
+                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">-- Select --</option>
+                <option>Renting</option>
+                <option>Own - Mortgage</option>
+                <option>Own - No Mortgage</option>
+            </select>
+            <p class="text-sm text-red-600 mt-1" id="home_ownership_error"></p>
+        </div>
+
+        <!-- Collateral -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Collateral</label>
+            <select id="collateral" name="collateral" required
+                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">-- Select --</option>
+                <option>none</option>
+                <option>low</option>
+                <option>medium</option>
+                <option>high</option>
+            </select>
+            <p class="text-sm text-red-600 mt-1" id="collateral_error"></p>
+        </div>
+
+        <!-- Mean Household Income -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Mean Household Income in Your Area</label>
+            <input type="number" id="mean_household_income" name="mean_household_income" step="0.01" min="0" required
+                   class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <p class="text-sm text-red-600 mt-1" id="mean_household_income_error"></p>
+        </div>
+
+        <!-- Marital Status -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Marital Status</label>
+            <select id="marital_status" name="marital_status" required
+                    class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">-- Select --</option>
+                <option>Single</option>
+                <option>Married (no dependents)</option>
+                <option>Married (dependents)</option>
+            </select>
+            <p class="text-sm text-red-600 mt-1" id="marital_status_error"></p>
+        </div>
+
+        <!-- Age -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Age</label>
+            <input type="number" id="age" name="age" min="18" required
+                   class="mt-1 w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+            <p class="text-sm text-red-600 mt-1" id="age_error"></p>
+        </div>
+
+        <!-- Submit -->
+        <div class="flex justify-end pt-4">
+            <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-md shadow">
+                Get Credit Score
+            </button>
+        </div>
+    </form>
+</div>
+
+    <script>
+    function showError(id, message) {
+        document.getElementById(id).innerText = message;
+    }
+
+    function clearError(id) {
+        document.getElementById(id).innerText = "";
+    }
+
+    document.getElementById("credit-form").addEventListener("submit", function(event) {
+        const errors = [];
+
+        const age = parseInt(document.getElementById("age").value);
+        if (isNaN(age) || age < 18 || age > 100) {
+            errors.push("Age must be between 18 and 100.");
+            showError("age_error", "Age must be between 18 and 100.");
+        } else {
+            clearError("age_error");
+        }
+
+        const monthlyIncome = parseFloat(document.getElementById("monthly_income").value);
+        if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
+            errors.push("Monthly income must be a number greater than 0.");
+            showError("monthly_income_error", "Must be greater than 0.");
+        } else {
+            clearError("monthly_income_error");
+        }
+
+        const householdIncome = parseFloat(document.getElementById("mean_household_income").value);
+        if (isNaN(householdIncome) || householdIncome <= 0) {
+            errors.push("Mean household income must be a number greater than 0.");
+            showError("mean_household_income_error", "Must be greater than 0.");
+        } else {
+            clearError("mean_household_income_error");
+        }
+
+        const nationalId = document.getElementById("national_id").value.trim();
+        if (!/^\d{8,9}$/.test(nationalId)) {
+            errors.push("National ID must be 8 or 9 digits.");
+            showError("national_id_error", "Must be 8 or 9 digits.");
+        } else {
+            clearError("national_id_error");
+        }
+
+        const requiredSelects = [
+            "education_level",
+            "employment_status",
+            "home_ownership",
+            "collateral",
+            "marital_status"
+        ];
+
+        requiredSelects.forEach(id => {
+            const value = document.getElementById(id).value.trim();
+            if (!value) {
+                errors.push(`${id.replaceAll("_", " ")} is required.`);
+                showError(`${id}_error`, "This field is required.");
+            } else {
+                clearError(`${id}_error`);
+            }
+        });
+
+        if (errors.length > 0) {
+            event.preventDefault();
+        }
+    });
+
+    // Add real-time validation
+    document.getElementById("national_id").addEventListener("input", function () {
+        if (!/^\d{8,9}$/.test(this.value.trim())) {
+            showError("national_id_error", "Must be 8 or 9 digits.");
+        } else {
+            clearError("national_id_error");
+        }
+    });
+
+    document.getElementById("age").addEventListener("input", function () {
+        const age = parseInt(this.value);
+        if (isNaN(age) || age < 18 || age > 100) {
+            showError("age_error", "Age must be between 18 and 100.");
+        } else {
+            clearError("age_error");
+        }
+    });
+
+    document.getElementById("monthly_income").addEventListener("input", function () {
+        const income = parseFloat(this.value);
+        if (isNaN(income) || income <= 0) {
+            showError("monthly_income_error", "Must be greater than 0.");
+        } else {
+            clearError("monthly_income_error");
+        }
+    });
+
+    document.getElementById("mean_household_income").addEventListener("input", function () {
+        const income = parseFloat(this.value);
+        if (isNaN(income) || income <= 0) {
+            showError("mean_household_income_error", "Must be greater than 0.");
+        } else {
+            clearError("mean_household_income_error");
+        }
+    });
+
+    ["education_level", "employment_status", "home_ownership", "collateral", "marital_status"].forEach(id => {
+        document.getElementById(id).addEventListener("change", function () {
+            if (!this.value.trim()) {
+                showError(`${id}_error`, "This field is required.");
+            } else {
+                clearError(`${id}_error`);
+            }
+        });
+    });
+    </script>
+</body>
+</html>
